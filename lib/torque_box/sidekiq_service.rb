@@ -21,18 +21,23 @@ module TorqueBox
       Sidekiq.options.merge!(config)
       Sidekiq.options[:queues] << 'default' if Sidekiq.options[:queues].empty?
 
-      if Sidekiq.options.has_key?(:logfile)
-        Sidekiq::Logging.initialize_logger(Sidekiq.options[:logfile])
-      else
-        Sidekiq::Logging.logger = TorqueBox::Logger.new('sidekiq') if ENV.has_key?('TORQUEBOX_CONTEXT')
-      end
+      #if Sidekiq.options.has_key?(:logfile)
+      #  Sidekiq::Logging.initialize_logger(Sidekiq.options[:logfile])
+      #else
+      #  Sidekiq::Logging.logger = TorqueBox::Logger.new('sidekiq') if ENV.has_key?('TORQUEBOX_CONTEXT')
+      #end
 
-      if Sidekiq.options.has_key?(:verbose)
-        Sidekiq.logger.level = Logger::DEBUG
-        Celluloid.logger = Sidekiq.logger
-      end
+      #if Sidekiq.options.has_key?(:verbose)
+      #  Sidekiq.logger.level = Logger::DEBUG
+      #  Celluloid.logger = Sidekiq.logger
+      #end
 
       require 'sidekiq/launcher'
+
+      require 'rails'
+      require 'sidekiq/rails'
+      require File.expand_path("#{Rails.root}/config/environment.rb")
+      ::Rails.application.eager_load!
 
       @launcher = Sidekiq::Launcher.new(Sidekiq.options)
 
